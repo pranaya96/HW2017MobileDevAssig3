@@ -1,6 +1,8 @@
 package com.pranayaa.howardchat;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -61,14 +63,21 @@ public class MainFragment extends Fragment {
 //                Log.i("PA", "The user Name Display is: " + user.getDisplayName());
 //                Log.i("PA", "The user ID is: " + user.getUid());
 
-                if (user == null) {
-                    Toast.makeText(getContext(), "Can't send message, not logged in", Toast.LENGTH_SHORT);
+                ConnectivityManager cm = (ConnectivityManager)getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                boolean isConnected = activeNetwork != null &&
+                        activeNetwork.isConnectedOrConnecting();
+
+                if (!isConnected) {
+                    Toast.makeText(getContext(), "Can't send message, not logged in", Toast.LENGTH_SHORT).show();
                     return;
                 }else{
                     String messageText = messageEditText.getText().toString();
                     //Log.i("PA", "The message is: " + messageText);
                     Message message = new Message(messageText, user.getDisplayName(), user.getUid());
                     MessageSource.get(getContext()).sendMessage(message);
+                    Toast.makeText(getContext(), "Message sent sucessfuly", Toast.LENGTH_SHORT).show();
                     messageEditText.setText("");
 
                 }
@@ -116,6 +125,7 @@ public class MainFragment extends Fragment {
 
             return rowView;
         }
+
     }
 
 
